@@ -133,6 +133,25 @@ resource "azurerm_storage_account" "this" {
     default_action = "Deny"
   }
 
-  depends_on = [azurerm_key_vault.this.id, azurerm_role_assignment.uai.id]
+  blob_properties {
+    change_feed_enabled           = true
+    change_feed_retention_in_days = 15
+    versioning_enabled            = true
+
+    restore_policy {
+      days = 7
+    }
+
+    container_delete_retention_policy {
+      days = 14
+    }
+
+    delete_retention_policy {
+      days = 14
+    }
+
+  }
+
+  depends_on = [azurerm_key_vault.this, azurerm_role_assignment.uai]
 
 }
