@@ -138,6 +138,7 @@ resource "azurerm_storage_account" "this" {
     change_feed_retention_in_days = 15
     versioning_enabled            = true
 
+
     restore_policy {
       days = 7
     }
@@ -154,4 +155,10 @@ resource "azurerm_storage_account" "this" {
 
   depends_on = [azurerm_key_vault.this, azurerm_role_assignment.uai]
 
+}
+
+resource "azurerm_storage_container" "this" {
+  name                  = "tfstate"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
 }
