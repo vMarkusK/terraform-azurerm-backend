@@ -30,12 +30,11 @@ provider "azurerm" {
 data "azuread_client_config" "this" {}
 
 locals {
-  app_name = "cmkdemo"
-  rg_name  = "rg-${local.app_name}-${random_string.suffix.result}"
-  uai_name = "uai-${local.app_name}-${random_string.suffix.result}"
-  kv_name  = "kv-${local.app_name}-${random_string.suffix.result}"
-  key_name = "cmk-${local.app_name}-${formatdate("YYYYMMDD-hhmm", time_static.current.rfc3339)}"
-  st_name  = "st${local.app_name}${random_string.suffix.result}"
+  rg_name  = "rg-${var.appname}-${random_string.suffix.result}"
+  uai_name = "uai-${var.appname}-${random_string.suffix.result}"
+  kv_name  = "kv-${var.appname}-${random_string.suffix.result}"
+  key_name = "cmk-${var.appname}-${formatdate("YYYYMMDD-hhmm", time_static.current.rfc3339)}"
+  st_name  = "st${var.appname}${random_string.suffix.result}"
 }
 
 resource "time_static" "current" {}

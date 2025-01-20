@@ -11,7 +11,7 @@ output "container_name" {
 }
 
 output "key" {
-  value = "${local.app_name}.terraform.tfstate"
+  value = "${var.appname}.terraform.tfstate"
 }
 
 output "use_azuread_auth" {
