@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.15.0"
+      version = ">= 4.25.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -17,7 +17,7 @@ terraform {
       version = ">= 3.4.5"
     }
   }
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.10.5"
 }
 
 provider "azurerm" {
@@ -33,7 +33,7 @@ locals {
   rg_name  = "rg-${var.appname}-${random_string.suffix.result}"
   uai_name = "uai-${var.appname}-${random_string.suffix.result}"
   kv_name  = "kv-${var.appname}-${random_string.suffix.result}"
-  key_name = "cmk-${var.appname}-${formatdate("YYYYMMDD-hhmm", time_static.current.rfc3339)}"
+  key_name = "cmk-${var.appname}-${random_string.suffix.result}"
   st_name  = "st${var.appname}${random_string.suffix.result}"
 }
 
@@ -85,17 +85,31 @@ resource "azurerm_role_assignment" "uai" {
   scope                = azurerm_key_vault.this.id
   role_definition_name = "Key Vault Crypto User"
   principal_id         = azurerm_user_assigned_identity.this.principal_id
+  principal_type       = "ServicePrincipal"
 }
 
 resource "azurerm_key_vault_key" "this" {
-  key_opts     = ["wrapKey", "unwrapKey"]
-  key_type     = "RSA"
-  key_size     = 2048
-  key_vault_id = azurerm_key_vault.this.id
   name         = local.key_name
+  key_vault_id = azurerm_key_vault.this.id
+
+
+  key_type = "RSA"
+  key_size = 4096
+  key_opts = ["wrapKey", "unwrapKey"]
+
+  expiration_date = timeadd(formatdate("YYYY-MM-DD'T'HH:mm:ss'Z'", time_static.current.rfc3339), "8760h")
+
+  rotation_policy {
+    automatic {
+      time_before_expiry = "P60D"
+    }
+
+    expire_after         = "P365D"
+    notify_before_expiry = "P30D"
+  }
 
   lifecycle {
-    create_before_destroy = true
+    ignore_changes = [expiration_date]
   }
 }
 
