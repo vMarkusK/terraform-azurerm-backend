@@ -1,6 +1,7 @@
 variable "appname" {
   description = "Unique identification"
   type        = string
+  default     = "tfstate"
 
 }
 variable "subscription_id" {
@@ -11,4 +12,5 @@ variable "subscription_id" {
 variable "location" {
   description = "Location for all resources"
   type        = string
+  default     = "germywestcentral"
 }
